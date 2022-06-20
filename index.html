@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html>
 
@@ -23,14 +22,14 @@
 			display: inline-block;
 			position: relative;
 			width: 88%;
-			height: 100px;
+			height: 130px;
 		}
 
 		/* image dimension */
 
 		img {
-			width: 95%;
-			height: 100%;
+			height: 130px;
+			float: left;
 		}
 
 		.desc {
@@ -39,7 +38,7 @@
 			float: right;
 			font-size: small;
 			line-height: 1;
-			overflow-wrap: break-word; 
+			overflow-wrap: break-word;
 			overflow: hidden;
 			word-break: break-all;
 			margin: 0;
@@ -72,11 +71,24 @@
 		function startUp() {
 			$("#imageListId").sortable({
 				update: function (event, ui) {
-					getIdsOfImages();
-				} //end update		
+					var values = [];
+					$('.listitemClass').each(function (index) {
+						values.push($(this).attr("data-id"));
+					});
+					returnToHost.pictureIDs = values;
+				},
+				start: function (event, ui) {
+					ui.item.startPos = ui.item.index();
+				},
+				stop: function (event, ui) {
+					// save start position and end position
+					returnToHost.reorderID = [ui.item.startPos, ui.item.index()];
+					// notify host that pictures has been updated. 
+					returnToHost.status1 = 'swapped';
+					document.title = 'updated';
+				}
 			});
 		};
-		var pictureCount = 0;
 
 		// update last inserted item description
 		function updateDesc(desc) {
@@ -87,18 +99,48 @@
 
 			pEle.innerHTML = desc;
 		}
+
 		// return the id of newly inserted picture.   
+		var pictureCount = 0;
 		function insertPicture(base64) {
 			var imgEle = $($('#template').html());
 			imgEle.attr('data-id', ++pictureCount);
 			imgEle.find('img').attr('src', base64);
+
 			imgEle.find('span').click(function (e) {
+				// remove index from array. 
+				var arr = returnToHost.pictureIDs;
+				var index = arr.indexOf(imgEle.attr('data-id'));
+
+				console.log(index);
 				$(e.target).closest('div').remove();
+
+				if (index > -1) {
+					arr.splice(index, 1);
+				}
+
+				// return the deleted index in array. , not the value. 
+				returnToHost.deletedID = index;
+				returnToHost.status1 = 'deleted';
+				document.title = 'updated';
 			});
+
 			$('#imageListId').append(imgEle);
+			returnToHost.pictureIDs.push(pictureCount + ""); // this is a string array.
 		}
 
-		function getIdsOfImages() {}
+		// save previous picture order in a array
+		// compare new order with old order. returnt the two pictures that are switched
+		// as well as deleted. 
+		// if return one number, it is the picture to be deleted. 
+		// if return two number, they are picture to be swapped. 
+		var returnToHost = {
+			status1: '', // there are two status, swapped, deleted
+			pictureIDs: [],
+			deletedID: 0, // return deleted id
+			reorderID: [] //  if reordered, return [original position, new position]. 
+		};
+
 	</script>
 </head>
 
@@ -107,7 +149,7 @@
 	<div data-id="0" class="listitemClass">
 		<span class="close">&times;</span>
 		<div>
-			<img src="">			
+			<img src="">
 			<!-- <p class="desc">Description</p> -->
 		</div>
 	</div>
