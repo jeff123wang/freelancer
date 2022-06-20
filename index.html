@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html>
 
@@ -8,89 +9,116 @@
 	<script src="https://code.jquery.com/jquery-1.10.2.js"></script>
 	<script src="https://code.jquery.com/ui/1.10.4/jquery-ui.js"></script>
 	<style>
-	/* text align for the body */
-	
-	body {
-		text-align: center;
-	}
-	/* image dimension */
-	
-	img {
-		height: 100px;
-		width: 100px;
-	}
-	/* imagelistId styling */
-	
-	#imageListId {
-		margin: 0;
-		padding: 0;
-		list-style-type: none;
-	}
-	/* Output order styling */
-	
-	#outputvalues {
-		margin: 0 2px 2px 2px;
-		padding: 0.4em;
-		padding-left: 1.5em;
-		width: 250px;
-		border: 2px solid dark-green;
-		background: gray;
-	}
-	
-	.listitemClass {
-		border: 1px solid #006400;
-		width: 100px;
-		margin: 0 4px 4px 4px;
-		padding: 0.4em;
-		display: inline-block;
-		position: relative;
-	}
-	
-	.listitemClass:before {
-		content: attr(data-id);
-	}
-	
-	.close {
-		position: absolute;
-		top: 2px;
-		right: 2px;
-		z-index: 100;
-	}
+		/* imagelistId styling */
+
+		#imageListId {
+			margin: 0;
+			padding: 0;
+			list-style-type: none;
+		}
+
+		.listitemClass {
+			border: 1px solid #006400;
+			margin-top: 20px;
+			padding: 0.4em;
+			display: inline-block;
+			position: relative;
+			width: 88%;
+			height: 100px;
+			background-color: rgba(255, 247, 0, 0.727);
+		}
+
+		/* image dimension */
+
+		img {
+			width: 50%;
+			height: 100%;
+			float: left;
+		}
+
+		.desc {
+			width: 50%;
+			height: 100px;
+			float: right;
+			font-size: small;
+			line-height: 1;
+			overflow-wrap: break-word; 
+			overflow: hidden;
+			word-break: break-all;
+			margin: 0;
+		}
+
+		.listitemClass:before {
+			content: attr(data-id);
+			position: absolute;
+			top: -22px;
+		}
+
+		.close {
+			position: absolute;
+			top: 2px;
+			right: 2px;
+			font-size: 40px;
+			line-height: 0.6;
+			z-index: 100;
+		}
 	</style>
 	<script>
-	var waitForJQuery = setInterval(function() {
-		if(typeof $ != 'undefined') {
-			// place your code here.
-			startUp();
-			clearInterval(waitForJQuery);
-		}
-	}, 10);
-	var ddd = 1000;
+		var waitForJQuery = setInterval(function () {
+			if (typeof $ != 'undefined') {
+				// place your code here.
+				startUp();
+				clearInterval(waitForJQuery);
+			}
+		}, 10);
 
-	function startUp() {
-		$(".close").click(function(e) {
-			$(e.target).closest('div').remove();
-		});
-		$("#imageListId").sortable({
-			update: function(event, ui) {
+		function startUp() {
+			$("#imageListId").sortable({
+				update: function (event, ui) {
 					getIdsOfImages();
 				} //end update		
-		});
-	};
+			});
+		};
+		var pictureCount = 0;
 
-	function getIdsOfImages() {}
+		// update last inserted item description
+		function updateDesc(desc) {
+			var pEle = $('#imageListId').find('p').last().get(0); // regular DOM object.
+			// const cssObj = window.getComputedStyle(pEle, null);
+
+			// if (pEle.offsetHeight / parseInt(cssObj.lineHeight) > 5) return;
+
+			pEle.innerHTML = desc;
+		}
+		// return the id of newly inserted picture.   
+		function insertPicture(base64) {
+			var imgEle = $($('#template').html());
+			imgEle.attr('data-id', ++pictureCount);
+			imgEle.find('img').attr('src', base64);
+			imgEle.find('span').click(function (e) {
+				$(e.target).closest('div').remove();
+			});
+			$('#imageListId').append(imgEle);
+		}
+
+		function getIdsOfImages() {}
 	</script>
 </head>
 
-<body>
-	<div id="imageListId">
-		<div data-id="1" class="listitemClass"> <span class="close">&times;</span> <img src="images/geeksimage1.png" alt=""> </div>
-		<div data-id="2" class="listitemClass"> <span class="close">&times;</span> <img src="images/geeksimage2.png" alt=""> </div>
-		<div data-id="3" class="listitemClass"> <span class="close">&times;</span> <img src="images/geeksimage3.png" alt=""> </div>
-		<div data-id="4" class="listitemClass"> <span class="close">&times;</span> <img src="images/geeksimage4.png" alt=""> </div>
-		<div data-id="5" class="listitemClass"> <span class="close">&times;</span> <img src="images/geeksimage5.png" alt=""> </div>
-		<div data-id="6" class="listitemClass"> <span class="close">&times;</span> <img src="images/geeksimage6.png" alt=""> </div>
+
+<script type="text/html" id="template">
+	<div data-id="0" class="listitemClass">
+		<span class="close">&times;</span>
+		<div>
+			<img src="">
+			<p class="desc">Description</p>
+		</div>
 	</div>
+</script>
+
+<body>
+	<h4>Drag to reorder:</h4>
+	<div id="imageListId"></div>
 </body>
 
 </html>
